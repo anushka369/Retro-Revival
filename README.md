@@ -1,6 +1,6 @@
 # AI-Enhanced Minesweeper
 
-An intelligent Minesweeper game that combines classic puzzle gameplay with modern AI features including smart hints, adaptive difficulty, and real-time probability analysis.
+An AI-enhanced intelligent Minesweeper game is a modern web application that combines the classic puzzle gameplay with modern artificial intelligence features. The system provides intelligent hints, adaptive difficulty, and real-time game probability analysis, while maintaining the core puzzle-solving experience and strategic thinking that makes Minesweeper engaging.
 
 ## Features
 
