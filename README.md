@@ -221,10 +221,6 @@ npm run test:ui         # Interactive test UI
 - Integration tests for user workflows
 - 90%+ code coverage for critical paths
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
 ---
 
-**Enjoy playing AI-Enhanced Minesweeper!** 🎮💣🤖
+**Enjoy playing the AI-Enhanced Minesweeper game!** 🎮💣🤖
