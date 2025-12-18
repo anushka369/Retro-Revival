@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>AI Minesweeper</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 10px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        background-color: #f5f5f5;
+        touch-action: manipulation;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      
+      #app {
+        max-width: 1200px;
+        margin: 0 auto;
+        text-align: center;
+      }
+      
+      .game-container {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        align-items: flex-start;
+        margin: 20px 0;
+      }
+      
+      .game-board {
+        flex-shrink: 0;
+      }
+      
+      #gameCanvas {
+        border: 2px solid #333;
+        background-color: #fff;
+        cursor: pointer;
+        touch-action: none;
+        max-width: 100%;
+        height: auto;
+      }
+      
+      .sidebar {
+        width: 300px;
+        text-align: left;
+      }
+      
+      /* Mobile-specific styles */
+      @media (max-width: 768px) {
+        body {
+          padding: 5px;
+        }
+        
+        .game-container {
+          flex-direction: column;
+          gap: 15px;
+          margin: 10px 0;
+        }
+        
+        .sidebar {
+          width: 100%;
+          max-width: 600px;
+          margin: 0 auto;
+        }
+        
+        #gameCanvas {
+          max-width: calc(100vw - 20px);
+        }
+        
+        .controls {
+          margin: 10px 0;
+        }
+        
+        button {
+          padding: 12px 16px;
+          margin: 2px;
+          font-size: 16px;
+          min-height: 44px; /* iOS touch target minimum */
+        }
+        
+        .difficulty-buttons button {
+          min-height: 44px;
+          padding: 12px;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .controls {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 8px;
+        }
+        
+        .controls button {
+          flex: 1;
+          min-width: 120px;
+        }
+      }
+      
+      .controls {
+        margin: 20px 0;
+      }
+      
+      #gameInfo {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 10px;
+      }
+      
+      #difficultyControls {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 10px;
+      }
+      
+      #difficultyControls h3 {
+        margin-top: 0;
+        font-size: 16px;
+      }
+      
+      #accessibilityControls {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 10px;
+      }
+      
+      #accessibilityControls h3 {
+        margin-top: 0;
+        font-size: 16px;
+      }
+      
+      .accessibility-options {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 10px 0;
+      }
+      
+      .accessibility-options label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+      }
+      
+      .keyboard-help {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #dee2e6;
+      }
+      
+      .keyboard-help h4 {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+      }
+      
+      .keyboard-help ul {
+        margin: 0;
+        padding-left: 20px;
+        font-size: 12px;
+      }
+      
+      .keyboard-help li {
+        margin-bottom: 4px;
+      }
+      
+      .difficulty-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 10px 0;
+      }
+      
+      .difficulty-buttons button {
+        width: 100%;
+        margin: 0;
+      }
+      
+      .adaptive-info {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #dee2e6;
+      }
+      
+      #difficultyNotifications {
+        margin-top: 10px;
+      }
+      
+      .notification {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 10px;
+        animation: slideIn 0.3s ease-out;
+      }
+      
+      .notification-increase {
+        background: #d1ecf1;
+        border-color: #17a2b8;
+      }
+      
+      .notification-decrease {
+        background: #f8d7da;
+        border-color: #dc3545;
+      }
+      
+      .notification-manual_override {
+        background: #d4edda;
+        border-color: #28a745;
+      }
+      
+      .notification-content p {
+        margin: 0 0 10px 0;
+        font-size: 14px;
+      }
+      
+      .notification-content button {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+      
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      button {
+        padding: 10px 20px;
+        margin: 0 5px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007acc;
+        color: white;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      
+      button:hover {
+        background-color: #005a9e;
+      }
+      
+      button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <h1>AI-Enhanced Minesweeper</h1>
+      <div class="controls">
+        <button id="newGameBtn">New Game</button>
+        <button id="hintBtn">Get Hint</button>
+        <button id="toggleProbabilityBtn">Toggle Probabilities</button>
+      </div>
+      
+      <div class="game-container">
+        <div class="game-board">
+          <canvas id="gameCanvas" width="600" height="600"></canvas>
+        </div>
+        <div class="sidebar">
+          <div id="probabilityControls"></div>
+          <div id="gameInfo">
+            <p>Mines: <span id="mineCount">0</span> | Time: <span id="timer">00:00</span> | Status: <span id="gameStatus">Ready</span></p>
+            <p>Hints Used: <span id="hintsUsed">0</span></p>
+          </div>
+          <div id="difficultyControls"></div>
+          <div id="accessibilityControls">
+            <h3>Accessibility Options</h3>
+            <div class="accessibility-options">
+              <label>
+                <input type="checkbox" id="highContrastToggle">
+                High Contrast Mode
+              </label>
+              <label>
+                <input type="checkbox" id="colorBlindToggle">
+                Colorblind Friendly
+              </label>
+              <button id="focusGameBtn">Focus Game Board</button>
+            </div>
+            <div class="keyboard-help">
+              <h4>Keyboard Controls</h4>
+              <ul>
+                <li>Arrow keys: Navigate</li>
+                <li>Enter/Space: Reveal cell</li>
+                <li>F: Flag cell</li>
+                <li>H: Get hint</li>
+              </ul>
+            </div>
+          </div>
+          <div id="difficultyNotifications"></div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
